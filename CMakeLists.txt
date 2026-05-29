@@ -154,7 +154,7 @@ if(NOT DEFINED HAVE_TLS)
 endif()
 
 target_compile_definitions(${PROJECT_NAME}
-  PUBLIC $<$<BOOL:${HAVE_EXECINFO_H}>:HAVE_EXEC_INFO_H>
+  PUBLIC $<$<BOOL:${HAVE_EXECINFO_H}>:HAVE_EXECINFO_H>
          $<$<BOOL:${PCRE}>:USE_PCRE>
          $<$<AND:$<BOOL:${PCRE}>,$<BOOL:${HAVE_PCREPOSIX_H}>>:HAVE_PCREPOSIX_H>
          $<$<BOOL:${HAVE_REGEX_H}>:HAVE_REGEX_H>
