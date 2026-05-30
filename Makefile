@@ -72,11 +72,11 @@ ifneq ($(shared), not-set)
 endif
 
 define run-config
-cmake $(CURDIR) -B"$(BUILDDIR)" $(CONFIG_FLAGS)
+cmake "$(CURDIR)" -B "$(BUILDDIR)" $(CONFIG_FLAGS)
 endef
 
 all clean install: $(BUILDDIR)
-	cmake --build $(BUILDDIR) $@
+	cmake --build $(BUILDDIR) --target $@
 
 uninstall:
 	 xargs rm < $(BUILDDIR)/install_manifest.txt
