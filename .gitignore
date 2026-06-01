@@ -57,5 +57,5 @@ lib/
 .svn/
 
 # AI/editor tooling scratch directories (never part of the source tree)
-.journal/
-sources/
+.aijournal/
+.aisources/
