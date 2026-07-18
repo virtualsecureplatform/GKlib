@@ -63,16 +63,40 @@ GK_MKRANDOM(gk_zu,  size_t, size_t)
 #define LM 0x7FFFFFFFULL /* Least significant 31 bits */
 
 
-/* The array for the state vector */
-static uint64_t mt[NN]; 
+/* The array for the state vector.  Thread-local: concurrent METIS
+   calls each seed and consume their own stream, so results stay
+   deterministic regardless of thread interleaving. */
+static _Thread_local uint64_t mt[NN];
 /* mti==NN+1 means mt[NN] is not initialized */
-static int mti=NN+1; 
+static _Thread_local int mti=NN+1;
 #endif /* USE_GKRAND */
+
+#ifdef USE_GKRAND
+/* Per-thread opt-out restoring the pre-GKRAND libc srand/rand
+   behavior for callers whose downstream consumers are sensitive to
+   the exact ordering sequences the old RNG produced (KLS: the
+   large-spral separator-pipeline class).  Thread-local so a caller
+   only affects its own stream. */
+static _Thread_local int gk_legacy_rand = 0;
+void gk_set_legacy_rand(int enable)
+{
+  gk_legacy_rand = enable;
+}
+#else
+void gk_set_legacy_rand(int enable)
+{
+  (void)enable;
+}
+#endif
 
 /* initializes mt[NN] with a seed */
 void gk_randinit(uint64_t seed)
 {
 #ifdef USE_GKRAND
+  if (gk_legacy_rand) {
+    srand((unsigned int) seed);
+    return;
+  }
   mt[0] = seed;
   for (mti=1; mti<NN; mti++) 
     mt[mti] = (6364136223846793005ULL * (mt[mti-1] ^ (mt[mti-1] >> 62)) + mti);
@@ -89,6 +113,9 @@ uint64_t gk_randint64(void)
   int i;
   unsigned long long x;
   static uint64_t mag01[2]={0ULL, MATRIX_A};
+
+  if (gk_legacy_rand)
+    return (uint64_t)(((uint64_t) rand()) << 32 | ((uint64_t) rand()));
 
   if (mti >= NN) { /* generate NN words at one time */
     /* if init_genrand64() has not been called, */
@@ -127,10 +154,11 @@ uint64_t gk_randint64(void)
 uint32_t gk_randint32(void)
 {
 #ifdef USE_GKRAND
+  if (gk_legacy_rand)
+    return (uint32_t)rand();
   return (uint32_t)(gk_randint64() & 0x7FFFFFFF);
 #else
   return (uint32_t)rand();
 #endif
 }
-
 

@@ -284,6 +284,7 @@ GK_MKRANDOM_PROTO(gk_d,   size_t, double)
 GK_MKRANDOM_PROTO(gk_idx, size_t, gk_idx_t)
 GK_MKRANDOM_PROTO(gk_z,   size_t, ssize_t)
 GK_MKRANDOM_PROTO(gk_zu,  size_t, size_t)
+void gk_set_legacy_rand(int);
 void gk_randinit(uint64_t);
 uint64_t gk_randint64(void);
 uint32_t gk_randint32(void);
@@ -423,4 +424,3 @@ double gk_cacheGetHitRate(gk_cache_t *cache);
 
 
 #endif
-
